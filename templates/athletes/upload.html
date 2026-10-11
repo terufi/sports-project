@@ -1,0 +1,30 @@
+{% extends 'athletes/base.html' %}
+{% block title %}Загрузка файла{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Загрузка файла JSON / XML</h1>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger small">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Загрузить</button>
+            <a href="{% url 'athletes:index' %}" class="btn btn-secondary">Отмена</a>
+        </form>
+        <hr>
+        <p class="text-muted small">
+            Структура JSON: <code>[{"name":"...", "age":25, "sport":"...", "country":"...", "achievements":"..."}]</code><br>
+            Структура XML: <code>&lt;athletes&gt;&lt;athlete&gt;&lt;name&gt;...&lt;/name&gt;...&lt;/athlete&gt;&lt;/athletes&gt;</code>
+        </p>
+    </div>
+</div>
+{% endblock %}

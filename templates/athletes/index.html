@@ -1,0 +1,56 @@
+{% extends 'athletes/base.html' %}
+{% block title %}Список данных{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Данные о спортсменах</h1>
+
+{% if not has_files %}
+    <div class="alert alert-warning">
+        На сервере нет ни одного файла с данными. Добавьте спортсмена или загрузите файл.
+    </div>
+{% else %}
+    {% for fd in files_data %}
+        <div class="file-block">
+            <h5>
+                {{ fd.filename }}
+                <span class="badge bg-secondary">{{ fd.records|length }} записей</span>
+            </h5>
+
+            {% if fd.error %}
+                <div class="alert alert-danger">{{ fd.error }}</div>
+            {% elif fd.records %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>ФИО</th>
+                                <th>Возраст</th>
+                                <th>Вид спорта</th>
+                                <th>Страна</th>
+                                <th>Достижения</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for rec in fd.records %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ rec.name }}</td>
+                                <td>{{ rec.age }}</td>
+                                <td>{{ rec.sport }}</td>
+                                <td>{{ rec.country }}</td>
+                                <td>{{ rec.achievements|default:"—" }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <details>
+                    <summary class="text-muted">Показать исходное содержимое файла</summary>
+                    <pre>{{ fd.records }}</pre>
+                </details>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}
