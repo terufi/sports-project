@@ -42,7 +42,6 @@ def validate_athlete_data(data):
 
 
 def validate_json_file(file_path):
-    """Проверка JSON-файла."""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -64,7 +63,6 @@ def validate_json_file(file_path):
 
 
 def validate_xml_file(file_path):
-    """Проверка XML-файла."""
     try:
         tree = ET.parse(file_path)
     except ET.ParseError as e:
@@ -92,7 +90,6 @@ def validate_xml_file(file_path):
 
 
 def save_athlete_to_json(athlete_data):
-    """Сохраняет в новый JSON-файл."""
     filename = sanitize_filename(f"athlete_{athlete_data['name']}.json")
     file_path = os.path.join(settings.DATA_DIR, filename)
     with open(file_path, 'w', encoding='utf-8') as f:
@@ -101,7 +98,6 @@ def save_athlete_to_json(athlete_data):
 
 
 def save_athlete_to_xml(athlete_data):
-    """Сохраняет в новый XML-файл."""
     filename = sanitize_filename(f"athlete_{athlete_data['name']}.xml")
     file_path = os.path.join(settings.DATA_DIR, filename)
 
@@ -135,7 +131,6 @@ def read_xml_file(file_path):
 
 
 def get_all_data_files():
-    """Список всех JSON/XML файлов в data/."""
     if not os.path.isdir(settings.DATA_DIR):
         return []
     return sorted([
@@ -145,7 +140,7 @@ def get_all_data_files():
 
 
 def read_data_file(filename):
-    """Читает файл по имени. Возвращает (records, error)."""
+    """Читает файл по имени."""
     file_path = os.path.join(settings.DATA_DIR, filename)
     if not os.path.isfile(file_path):
         return None, 'Файл не найден.'

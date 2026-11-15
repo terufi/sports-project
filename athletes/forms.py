@@ -3,7 +3,6 @@ from django import forms
 
 
 class AthleteForm(forms.Form):
-    """Форма для ввода данных о спортсмене."""
     name = forms.CharField(
         max_length=100,
         label='ФИО спортсмена',
@@ -30,12 +29,27 @@ class AthleteForm(forms.Form):
         label='Достижения',
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Олимпийский чемпион 2020'})
     )
-    file_format = forms.ChoiceField(
-        choices=[('json', 'JSON'), ('xml', 'XML')],
-        label='Формат файла',
-        widget=forms.Select(attrs={'class': 'form-control'})
+    
+    # --- НОВЫЕ ПОЛЯ ДЛЯ ВЫБОРА ИСТОЧНИКА ---
+    SAVE_CHOICES = [
+        ('file', 'Сохранить в файл'),
+        ('db', 'Сохранить в базу данных'),
+    ]
+    save_target = forms.ChoiceField(
+        choices=SAVE_CHOICES, 
+        label="Куда сохранить?", 
+        widget=forms.RadioSelect,
+        initial='file' # По умолчанию выбран файл
     )
 
+    file_format = forms.ChoiceField(
+        choices=[('json', 'JSON'), ('xml', 'XML')],
+        label='Формат файла (если выбран файл)',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False
+    )
+
+    # Валидация имени
     def clean_name(self):
         name = self.cleaned_data['name'].strip()
         if not re.match(r'^[А-Яа-яЁёA-Za-z\s\-]+$', name):
@@ -46,7 +60,6 @@ class AthleteForm(forms.Form):
 
 
 class UploadFileForm(forms.Form):
-    """Форма для загрузки файла с данными."""
     file = forms.FileField(
         label='Файл (JSON или XML)',
         widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': '.json,.xml'})

@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-%ovxyrgtdff-f1u(6!7d)_oe+(k(f*d-sh38(w%-5*bk^s_w6(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sport-project.de1.netrun.io', '127.0.0.1', 'localhost']
 
 
 # Application definition

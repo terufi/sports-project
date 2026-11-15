@@ -4,53 +4,151 @@
 {% block content %}
 <h1 class="mb-4">Данные о спортсменах</h1>
 
-{% if not has_files %}
-    <div class="alert alert-warning">
-        На сервере нет ни одного файла с данными. Добавьте спортсмена или загрузите файл.
-    </div>
-{% else %}
-    {% for fd in files_data %}
-        <div class="file-block">
-            <h5>
-                {{ fd.filename }}
-                <span class="badge bg-secondary">{{ fd.records|length }} записей</span>
-            </h5>
+<!-- ПЕРЕКЛЮЧАТЕЛЬ ИСТОЧНИКОВ -->
+<div class="mb-4">
+    <a href="?source=files" class="btn {% if source == 'files' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        Данные из файлов
+    </a>
+    <a href="?source=db" class="btn {% if source == 'db' %}btn-success{% else %}btn-outline-success{% endif %}">
+        Данные из базы (БД)
+    </a>
+</div>
 
-            {% if fd.error %}
-                <div class="alert alert-danger">{{ fd.error }}</div>
-            {% elif fd.records %}
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered align-middle">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>#</th>
-                                <th>ФИО</th>
-                                <th>Возраст</th>
-                                <th>Вид спорта</th>
-                                <th>Страна</th>
-                                <th>Достижения</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for rec in fd.records %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ rec.name }}</td>
-                                <td>{{ rec.age }}</td>
-                                <td>{{ rec.sport }}</td>
-                                <td>{{ rec.country }}</td>
-                                <td>{{ rec.achievements|default:"—" }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <details>
-                    <summary class="text-muted">Показать исходное содержимое файла</summary>
-                    <pre>{{ fd.records }}</pre>
-                </details>
-            {% endif %}
+<!-- ================= ВЫВОД ИЗ ФАЙЛОВ ================= -->
+{% if source == 'files' %}
+    {% if not has_files %}
+        <div class="alert alert-warning">
+            На сервере нет ни одного файла с данными. Добавьте спортсмена или загрузите файл.
         </div>
-    {% endfor %}
+    {% else %}
+        {% for fd in files_data %}
+            <div class="file-block mb-4">
+                <h5>
+                    {{ fd.filename }}
+                    <span class="badge bg-secondary">{{ fd.records|length }} записей</span>
+                </h5>
+
+                {% if fd.error %}
+                    <div class="alert alert-danger">{{ fd.error }}</div>
+                {% elif fd.records %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>ФИО</th>
+                                    <th>Возраст</th>
+                                    <th>Вид спорта</th>
+                                    <th>Страна</th>
+                                    <th>Достижения</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for rec in fd.records %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ rec.name }}</td>
+                                    <td>{{ rec.age }}</td>
+                                    <td>{{ rec.sport }}</td>
+                                    <td>{{ rec.country }}</td>
+                                    <td>{{ rec.achievements|default:"—" }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <details>
+                        <summary class="text-muted">Показать исходное содержимое файла</summary>
+                        <pre>{{ fd.records }}</pre>
+                    </details>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+<!-- ================= ВЫВОД ИЗ БАЗЫ ДАННЫХ ================= -->
+{% elif source == 'db' %}
+    <!-- Поле для поиска -->
+    <div class="mb-3">
+        <input type="text" id="search-input" class="form-control" placeholder="🔍 Поиск по имени или виду спорта...">
+    </div>
+
+    <div id="db-table-container">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Имя</th>
+                    <th>Возраст</th>
+                    <th>Вид спорта</th>
+                    <th>Страна</th>
+                    <th>Достижения</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody id="athletes-tbody">
+                {% for athlete in db_athletes %}
+                <tr>
+                    <td>{{ athlete.name }}</td>
+                    <td>{{ athlete.age }}</td>
+                    <td>{{ athlete.sport }}</td>
+                    <td>{{ athlete.country }}</td>
+                    <td>{{ athlete.achievements|default:"—" }}</td>
+                <td>
+            <a href="{% url 'athletes:edit_athlete' athlete.id %}" class="btn btn-sm btn-primary">✏️</a>
+            <form action="{% url 'athletes:delete_athlete' athlete.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Удалить запись?');">🗑️</button>
+            </form>
+        </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">В базе данных пока нет записей.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- СКРИПТ ДЛЯ AJAX-ПОИСКА -->
+    <script>
+    document.getElementById('search-input').addEventListener('input', function() {
+        let query = this.value;
+        
+        // Отправляем AJAX запрос на наш новый URL
+        fetch(`/ajax/search/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                let tbody = document.getElementById('athletes-tbody');
+                tbody.innerHTML = ''; // Очищаем старую таблицу
+                
+                if (data.results.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5">Ничего не найдено.</td></tr>';
+                    return;
+                }
+
+                // Заново заполняем таблицу
+                data.results.forEach(athlete => {
+                    let row = `
+                        <tr>
+                            <td>${athlete.name}</td>
+                            <td>${athlete.age}</td>
+                            <td>${athlete.sport}</td>
+                            <td>${athlete.country}</td>
+                            <td>${athlete.achievements || '—'}</td>
+                        <td>
+                <a href="/edit/${athlete.id}/" class="btn btn-sm btn-primary"></a>
+                <form action="/delete/${athlete.id}/" method="post" style="display:inline;">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Удалить запись?');"></button>
+                </form>
+            </td>
+                            </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            });
+    });
+    </script>
 {% endif %}
 {% endblock %}

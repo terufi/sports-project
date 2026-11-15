@@ -1,0 +1,27 @@
+{% extends 'athletes/base.html' %}
+{% block title %}Редактирование{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Редактировать данные спортсмена</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="text-danger small">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-success">Сохранить изменения</button>
+            <a href="/?source=db" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
