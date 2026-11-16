@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['sport-project.de1.netrun.io', '127.0.0.1', 'localhost']
 
+CSRF_TRUSTED_ORIGINS = ['https://sport-project.de1.netrun.io']
 
 # Application definition
 
