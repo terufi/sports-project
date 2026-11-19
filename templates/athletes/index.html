@@ -14,7 +14,7 @@
     </a>
 </div>
 
-<!-- ================= ВЫВОД ИЗ ФАЙЛОВ ================= -->
+<!-- ВЫВОД ИЗ ФАЙЛОВ -->
 {% if source == 'files' %}
     {% if not has_files %}
         <div class="alert alert-warning">
@@ -66,11 +66,11 @@
         {% endfor %}
     {% endif %}
 
-<!-- ================= ВЫВОД ИЗ БАЗЫ ДАННЫХ ================= -->
+<!-- ВЫВОД ИЗ БАЗЫ ДАННЫХ -->
 {% elif source == 'db' %}
     <!-- Поле для поиска -->
     <div class="mb-3">
-        <input type="text" id="search-input" class="form-control" placeholder="🔍 Поиск по имени или виду спорта...">
+        <input type="text" id="search-input" class="form-control" placeholder=" Поиск по имени или виду спорта...">
     </div>
 
     <div id="db-table-container">

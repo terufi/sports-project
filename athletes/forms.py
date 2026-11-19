@@ -30,7 +30,6 @@ class AthleteForm(forms.Form):
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Олимпийский чемпион 2020'})
     )
     
-    # --- НОВЫЕ ПОЛЯ ДЛЯ ВЫБОРА ИСТОЧНИКА ---
     SAVE_CHOICES = [
         ('file', 'Сохранить в файл'),
         ('db', 'Сохранить в базу данных'),

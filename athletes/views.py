@@ -19,17 +19,14 @@ from .models import Athlete
 
 
 def index(request):
-    """Главная: показывает либо файлы, либо записи из БД."""
-    source = request.GET.get('source', 'files') # По умолчанию файлы
+    source = request.GET.get('source', 'files') 
     
     files_data = []
     db_athletes = []
 
     if source == 'db':
-        # Берем данные из базы
         db_athletes = Athlete.objects.all().order_by('-id')
     else:
-        # Берем данные из файлов
         files = get_all_data_files()
         for filename in files:
             records, error = read_data_file(filename)
@@ -48,7 +45,6 @@ def index(request):
 
 
 def add_athlete(request):
-    """Добавление спортсмена через форму (в файл или БД)."""
     if request.method == 'POST':
         form = AthleteForm(request.POST)
         if form.is_valid():
@@ -63,7 +59,6 @@ def add_athlete(request):
             save_target = form.cleaned_data.get('save_target')
             
             if save_target == 'db':
-                # ЛОГИКА БД
                 if Athlete.objects.filter(name=athlete_data['name'], sport=athlete_data['sport']).exists():
                     messages.error(request, f'Спортсмен {athlete_data["name"]} уже есть в базе!')
                 else:
@@ -72,7 +67,6 @@ def add_athlete(request):
                     return redirect('athletes:index')
             
             elif save_target == 'file':
-                # ЛОГИКА ФАЙЛОВ
                 fmt = form.cleaned_data.get('file_format', 'json')
                 try:
                     if fmt == 'json':
@@ -90,7 +84,6 @@ def add_athlete(request):
 
 
 def upload_file(request):
-    """Загрузка файла с валидацией."""
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -121,7 +114,6 @@ def upload_file(request):
 
 
 def search_athletes(request):
-    """AJAX-поиск спортсменов по имени или виду спорта."""
     query = request.GET.get('q', '')
     if query:
         results = Athlete.objects.filter(name__icontains=query) | Athlete.objects.filter(sport__icontains=query)
@@ -142,7 +134,6 @@ def search_athletes(request):
 
 
 def delete_athlete(request, pk):
-    """Удаление спортсмена из БД."""
     athlete = get_object_or_404(Athlete, pk=pk)
     if request.method == 'POST':
         athlete.delete()
@@ -151,7 +142,6 @@ def delete_athlete(request, pk):
 
 
 def edit_athlete(request, pk):
-    """Редактирование спортсмена в БД."""
     athlete = get_object_or_404(Athlete, pk=pk)
     if request.method == 'POST':
         form = AthleteForm(request.POST)
