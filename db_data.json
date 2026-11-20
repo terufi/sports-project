@@ -1,0 +1,13 @@
+[
+{
+  "model": "athletes.athlete",
+  "pk": 3,
+  "fields": {
+    "name": "Абдиянова Арина Васильевна",
+    "sport": "Бадминтон",
+    "age": 25,
+    "country": "Россия",
+    "achievements": "Чемпион 2025"
+  }
+}
+]
