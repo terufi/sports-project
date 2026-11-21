@@ -1,10 +1,10 @@
 # Sports Project — импорт/экспорт данных спортсменов
 
-Django-приложение для ввода, хранения и отображения данных о спортсменах с поддержкой форматов JSON и XML, а также реляционной базы данных SQLite.
+Django-приложение для ввода, хранения и отображения данных о спортсменах с поддержкой форматов JSON и XML, а также реляционных баз данных (SQLite / PostgreSQL). На текущем этапе проект полностью контейнеризирован.
 
 ## Возможности
 - Ввод данных спортсмена через HTML-форму
-- Выбор источника сохранения: в файл (JSON или XML) или в базу данных (SQLite)
+- Выбор источника сохранения: в файл (JSON или XML) или в базу данных
 - Проверка на дубликаты при сохранении в БД
 - Валидация вводимых данных (ФИО, возраст, вид спорта, страна)
 - Загрузка готовых JSON/XML-файлов с проверкой валидности
@@ -19,17 +19,30 @@ Django-приложение для ввода, хранения и отобра�
 - Python 3.12
 - Django 6.1
 - Bootstrap 5.3
-- SQLite
+- SQLite (локальная разработка)
+- PostgreSQL 15 (Docker)
+- Docker, Docker Compose
 
-## Установка и запуск
+##  Запуск через Docker (с PostgreSQL)
 
-```bash
-git clone https://github.com/terufi/sports-project.git
-cd sports-project
+Для запуска проекта необходим установленный и запущенный **Docker Desktop**.
 
-python -m venv .venv
-.venv\Scripts\activate
+1. Создайте файл `.env` в корне проекта (он добавлен в `.gitignore`):
+   ```env
+   SECRET_KEY=ваш_секретный_ключ_django
+   DEBUG=True
+   ALLOWED_HOSTS=*
+   DB_NAME=sports_db
+   DB_USER=sports_user
+   DB_PASSWORD=super_secret_password
+   DB_HOST=db
+   DB_PORT=5432
 
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
+2. Соберите и запустите контейнеры:
+    docker compose up -d --build
+
+3. Примените миграции для создания таблиц в PostgreSQL:
+    docker compose exec web python manage.py migrate
+
+4. Чтобы остановить контейнеры, выполните:
+    docker compose down
