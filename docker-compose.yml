@@ -3,8 +3,6 @@ services:
     image: postgres:15-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - .env
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
@@ -24,8 +22,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # Эта строчка нужна для локального запуска
     env_file:
       - .env
+    # А эти переменные нужны для Netrun (и для локального тоже не помешают)
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
 
 volumes:
   postgres_data:
